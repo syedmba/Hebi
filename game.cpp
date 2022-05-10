@@ -7,26 +7,23 @@
 
 #include "game.h"
 
-#define BLOCK   "\xE2\x96\x88"
-
 using namespace std;
-
-
 
 // void updatePositionArray() ???
 
 void printFrame(Snake snake){
-    initscr();
+    refresh();
     for (int i = 0; i < areaHeight; i++){
         for (int j = 0; j < areaLength; j++){
-            mvprintw(j, i, " ");
             if (i == areaHeight - 1 || i == 0 || j == 0 || j == areaLength - 1){
-                mvprintw(j, i, BLOCK);
+                mvprintw(areaHeight - i - 1, j, "X");
+            } else {
+                mvprintw(areaHeight - i - 1, j, " ");
             }
         }
     }
     for (int i = 0; i < snake.length; i++){
-        mvprintw(snake.positionArray[i][0], snake.positionArray[i][1], BLOCK);
+        mvprintw(areaHeight - 1 - snake.positionArray[i][1], snake.positionArray[i][0], "O");
     }
 }
 
@@ -46,7 +43,7 @@ string determineDirection(Snake snake){
     }
 }
 
-void generateNextFrame(Snake snake ,string playerInput){
+void generateNextFrame(Snake snake, string playerInput){
     string direction = determineDirection(snake);
     if (playerInput == "UP"){
         if (direction != "DOWN"){
@@ -86,25 +83,45 @@ void generateNextFrame(Snake snake ,string playerInput){
 }
 
 bool Game(){
+    initscr();
+    refresh();
     Snake snake;
     snake.length = 2;
     snake.speed = 1;        // will not implement for now
 
+    int collectibleAt[2] = {-1, -1};
 
     int area[areaHeight][areaLength];
 
     snake.positionArray = new int*[snake.length];
     for (int i = 0; i < snake.length; i++){
         snake.positionArray[i] = new int[2];
+        snake.positionArray[i][0] = 15 - i;
+        snake.positionArray[i][1] = 15;
     }
 
     bool Alive = true;
     string playerInput;
 
     while (Alive){
-        playerInput = takeInput();
-        generateNextFrame(snake, playerInput);
         printFrame(snake);
+        playerInput = takeInput();
+
+        // set player input according to generateNextFrame() function
+        // suggested implementation: change "UP" to "A" (etc) in the function and remove these lines
+        if (playerInput == "A"){
+            playerInput = "UP";
+        } else if (playerInput == "B"){
+            playerInput = "DOWN";
+        } else if (playerInput == "C"){
+            playerInput = "RIGHT";
+        } else if (playerInput == "D"){
+            playerInput = "LEFT";
+        }
+
+        generateCollectibles(snake, collectibleAt);
+        generateNextFrame(snake, playerInput);
+        // printFrame(snake);
     }
 
     return 1;
@@ -112,9 +129,11 @@ bool Game(){
 }
 
 string takeInput(){
+    move(areaHeight + 1, areaLength + 1);
+    refresh();
     string response;
     response = getch();
-    if (response != "^["){
+    if (response != "\033"){
         takeInput();
     }
     getch();
@@ -123,4 +142,40 @@ string takeInput(){
         return response;
     }
     return takeInput();
+}
+
+void generateCollectibles(Snake snake, int collectibleAt[2]){
+    if (collectibleAt[0] == -1 && collectibleAt[1] == -1){
+        srand(time(0));
+        int determiner = rand() % 20;
+        if (determiner != 3){
+            return;
+        } else {
+            // proceed to generate new collectible
+            int x_value = rand() % (areaLength - 1) + 1;
+            int y_value = rand() % (areaHeight - 1) + 1;
+            bool clash = false;
+            for (int i = 0; i < snake.length; i++){
+                if (x_value == snake.positionArray[i][0] && y_value == snake.positionArray[i][1]){
+                    // clash with snake coordinates
+                    clash = true;
+                    break;
+                }
+            }
+            while (clash){
+                int x_value = rand() % (areaLength - 1) + 1;
+                int y_value = rand() % (areaHeight - 1) + 1;
+                for (int i = 0; i < snake.length; i++){
+                    if (x_value == snake.positionArray[i][0] && y_value == snake.positionArray[i][1]){
+                        // clash with snake coordinates
+                        clash = true;
+                        break;
+                    }
+                }
+            }
+            collectibleAt[0] = x_value;
+            collectibleAt[1] = y_value;
+        }
+    }
+    return;
 }
