@@ -1,7 +1,9 @@
 # Makefile
 # Created on 9 May 2022 by S M Bin Asif
 
-FLAGS = -lncurses -pedantic-errors -std=c++11
+FLAGS = -pedantic-errors -std=c++11
+
+LDFLAGS = -l ncurses -o $@
 
 game.o: game.cpp game.h
 	g++ $(FLAGS) -c $<
@@ -10,7 +12,7 @@ main.o: main.cpp game.h
 	g++ $(FLAGS) -c $<
 
 main: main.o game.o
-	g++ $(FLAGS) $^ -o $@
+	g++ $(LDFLAGS) main.o game.o
 
 clean:
 	rm -f game game.o walk.o battle.o skeletonart.o printterrain.o npcdialogueone.o inventory.o nextarea.o game.tgz
