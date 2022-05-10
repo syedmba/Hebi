@@ -11,6 +11,6 @@ int main(){
 
     int result = Game();
 
-    return 0;
+    return result;
 }
 
