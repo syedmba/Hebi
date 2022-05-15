@@ -43,10 +43,38 @@ string determineDirection(Snake snake){
     }
 }
 
-void generateNextFrame(Snake snake, string playerInput){
+void makeSnakeLonger(Snake snake, int collectibleAt[2]){
+    // preserve old coordinates
+    int **oldSnake;
+    oldSnake = new int*[snake.length];
+    for (int i = 0; i < snake.length; i++){
+        oldSnake[i] = new int[2];
+        oldSnake[i][0] = snake.positionArray[i][0];
+        oldSnake[i][1] = snake.positionArray[i][1];
+    }
+    
+    // create new array
+    snake.length++;
+
+    snake.positionArray = new int*[snake.length];
+    snake.positionArray[0][0] = collectibleAt[0];
+    snake.positionArray[0][1] = collectibleAt[1];
+    for (int i = 1; i < snake.length; i++){
+        snake.positionArray[i][0] = oldSnake[i-1][0];
+        snake.positionArray[i][1] = oldSnake[i-1][1];
+    }
+}
+
+void generateNextFrame(Snake snake, string playerInput, int collectibleAt[2]){
     string direction = determineDirection(snake);
     if (playerInput == "UP"){
         if (direction != "DOWN"){
+            if (snake.positionArray[0][0] == collectibleAt[0] && snake.positionArray[0][1] == collectibleAt[1] - 1){
+                // collectible will be collected
+
+                
+
+            }
             for (int i = snake.length - 1; i > 0; i--){
                 snake.positionArray[i][0] = snake.positionArray[i-1][0];
                 snake.positionArray[i][1] = snake.positionArray[i-1][1];
@@ -78,7 +106,7 @@ void generateNextFrame(Snake snake, string playerInput){
             snake.positionArray[0][0] = snake.positionArray[0][0] + 1;
         }
     } else {
-        generateNextFrame(snake, direction);
+        generateNextFrame(snake, direction, collectibleAt);
     }
 }
 
@@ -120,7 +148,7 @@ bool Game(){
         }
 
         generateCollectibles(snake, collectibleAt);
-        generateNextFrame(snake, playerInput);
+        generateNextFrame(snake, playerInput, collectibleAt);
         // printFrame(snake);
     }
 
