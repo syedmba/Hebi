@@ -11,7 +11,7 @@ int main(){
 
     cout << "Starting Game ..." << endl;
 
-    sleep(5);
+    // sleep(5);
 
     // game title
 
@@ -31,7 +31,7 @@ int main(){
 
     for (int i = 0; i < titleSize; i++){
         cout << title_array[i] << endl;
-        sleep(1);
+        // sleep(1);
     }
 
     // cout << "   ██░ ██ ▓█████  ▄▄▄▄    ██▓" << endl;
@@ -45,7 +45,7 @@ int main(){
     // cout << "   ░  ░  ░   ░  ░ ░       ░  " << endl;
     // cout << "                       ░     " << endl;
 
-    sleep(3);
+    // sleep(3);
 
     // run actual game
 
